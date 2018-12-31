@@ -6,6 +6,7 @@ import com.jfinal.kit.PathKit;
 import com.jfinal.kit.PropKit;
 import com.jfinal.template.Engine;
 import top.thevsk.controller.ArkOrderController;
+import top.thevsk.controller.AzurLaneController;
 import top.thevsk.controller.MainController;
 import top.thevsk.interceptors.AuthInterceptor;
 import top.thevsk.interceptors.PostInterceptor;
@@ -19,6 +20,7 @@ public class HttpConfig extends JFinalConfig {
     public void configRoute(Routes routes) {
         routes.add("/", MainController.class);
         routes.add("/arkOrder", ArkOrderController.class);
+        routes.add("/azurLane", AzurLaneController.class);
     }
 
     public void configEngine(Engine engine) {

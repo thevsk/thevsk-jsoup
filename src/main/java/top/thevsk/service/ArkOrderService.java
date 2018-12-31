@@ -11,6 +11,9 @@ import top.thevsk.utils.CQUtils;
 
 import java.io.IOException;
 
+/**
+ * 方舟指令wiki查询
+ */
 public class ArkOrderService extends BaseService {
 
     private static final String wikiUrl = "http://wiki.joyme.com/fzzl/";
@@ -19,6 +22,10 @@ public class ArkOrderService extends BaseService {
     private StringBuilder templateOfGodUpdate;
     private StringBuilder templateOfPlace;
     private StringBuilder templateOfWeapon;
+
+    private String copyright() {
+        return "内容来源：方舟WIKI *注:仅转载，不作为商业用途";
+    }
 
     @Override
     public void init() {
@@ -352,10 +359,6 @@ public class ArkOrderService extends BaseService {
         }
         template = template.replace("{copyright}", copyright());
         return template;
-    }
-
-    private String copyright() {
-        return "内容来源：方舟WIKI";
     }
 
     private String clean(String s) {
