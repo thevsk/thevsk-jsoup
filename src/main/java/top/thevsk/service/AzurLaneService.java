@@ -71,10 +71,6 @@ public class AzurLaneService extends BaseService {
         templateOfShip.append(Constants.newLine);
         templateOfShip.append("{性能}");
         templateOfShip.append(Constants.nextMsg);
-        templateOfShip.append("突破升星效果:");
-        templateOfShip.append(Constants.newLine);
-        templateOfShip.append("{突破升星效果}");
-        templateOfShip.append(Constants.nextMsg);
         templateOfShip.append("技能:");
         templateOfShip.append(Constants.newLine);
         templateOfShip.append("{技能}");
@@ -135,7 +131,7 @@ public class AzurLaneService extends BaseService {
         }
         Document document = connect(name.trim().replace(" ", ""));
         if (document == null) {
-            throw new VskException("目标不存在或无法访问");
+            throw new VskException("404!!");
         }
         Type type = getType(document);
         switch (type) {
@@ -180,21 +176,76 @@ public class AzurLaneService extends BaseService {
     private String parseShip(Document d) {
         String template = templateOfShip.toString();
         Elements t = d.select(".sv-general");
-        template = template.replace("{立绘}", CQUtils.image(d.select("div.Contentbox2 img").get(0).attr("src")));
-        template = template.replace("{名称}", clean(t.select("tr:eq(0) td:eq(0)").text()));
-        template = template.replace("{编号}", clean(t.select("tr:eq(1) td:eq(2)").text()));
-        template = template.replace("{初始星级}", clean(t.select("tr:eq(1) td:eq(4)").text()));
-        template = template.replace("{类型}", clean(t.select("tr:eq(2) td:eq(1)").text()));
-        template = template.replace("{稀有度}", clean(t.select("tr:eq(2) td:eq(3)").text()));
-        template = template.replace("{阵营}", clean(t.select("tr:eq(3) td:eq(1)").text()));
-        template = template.replace("{耗时}", clean(t.select("tr:eq(3) td:eq(3)").text()));
-        template = template.replace("{营养价值}", clean(t.select("tr:eq(6) td:eq(1)").text()));
-        template = template.replace("{退役收益}", clean(t.select("tr:eq(7) td:eq(1)").text()));
-        template = template.replace("{普通掉落点}", clean(t.select("tr:eq(4) td:eq(1)").text()));
-        template = template.replace("{活动掉落点}", clean(t.select("tr:eq(5) td:eq(1)").text()));
-        template = template.replace("{性能}", parseShip1(d));
-        template = template.replace("{突破升星效果}", parseShip2(d));
-        template = template.replace("{技能}", parseShip3(d));
+        try {
+            template = template.replace("{立绘}", CQUtils.image(d.select("div.Contentbox2 img").get(0).attr("src")));
+        } catch (Exception e) {
+            e.getMessage();
+        }
+        try {
+            template = template.replace("{名称}", clean(t.select("tr:eq(0) td:eq(0)").text()));
+        } catch (Exception e) {
+            e.getMessage();
+        }
+        try {
+            template = template.replace("{编号}", clean(t.select("tr:eq(1) td:eq(2)").text()));
+        } catch (Exception e) {
+            e.getMessage();
+        }
+        try {
+            template = template.replace("{初始星级}", clean(t.select("tr:eq(1) td:eq(4)").text()));
+        } catch (Exception e) {
+            e.getMessage();
+        }
+        try {
+            template = template.replace("{类型}", clean(t.select("tr:eq(2) td:eq(1)").text()));
+        } catch (Exception e) {
+            e.getMessage();
+        }
+        try {
+            template = template.replace("{稀有度}", clean(t.select("tr:eq(2) td:eq(3)").text()));
+        } catch (Exception e) {
+            e.getMessage();
+        }
+        try {
+            template = template.replace("{阵营}", clean(t.select("tr:eq(3) td:eq(1)").text()));
+        } catch (Exception e) {
+            e.getMessage();
+        }
+        try {
+            template = template.replace("{耗时}", clean(t.select("tr:eq(3) td:eq(3)").text()));
+        } catch (Exception e) {
+            e.getMessage();
+        }
+        try {
+            template = template.replace("{营养价值}", clean(t.select("tr:eq(6) td:eq(1)").text()));
+        } catch (Exception e) {
+            e.getMessage();
+        }
+        try {
+            template = template.replace("{退役收益}", clean(t.select("tr:eq(7) td:eq(1)").text()));
+        } catch (Exception e) {
+            e.getMessage();
+        }
+        try {
+            template = template.replace("{普通掉落点}", clean(t.select("tr:eq(4) td:eq(1)").text()));
+        } catch (Exception e) {
+            e.getMessage();
+        }
+        try {
+            template = template.replace("{活动掉落点}", clean(t.select("tr:eq(5) td:eq(1)").text()));
+        } catch (Exception e) {
+            e.getMessage();
+        }
+        try {
+            template = template.replace("{性能}", parseShip1(d));
+        } catch (Exception e) {
+            e.getMessage();
+        }
+        try {
+            template = template.replace("{技能}", parseShip3(d));
+        } catch (Exception e) {
+            e.getMessage();
+        }
         template = template.replace("{copyright}", copyright());
         return template;
     }
@@ -240,21 +291,6 @@ public class AzurLaneService extends BaseService {
         return s.trim();
     }
 
-    private String parseShip2(Document d) {
-        String template = templateOfShip2.toString();
-        StringBuilder result = new StringBuilder();
-        Elements t = d.select(".sv-breakthrough").get(1).select("tr");
-        for (int i = 0; i < t.size(); i++) {
-            if (i == 0) continue;
-            Element tr = t.get(i);
-            String res = template;
-            res = res.replace("{阶段}", clean(tr.select("td:eq(0)").text()));
-            res = res.replace("{阶段内容}", clean(tr.select("td:eq(1)").text()));
-            result.append(res);
-        }
-        return result.toString();
-    }
-
     private String parseShip3(Document d) {
         String template = templateOfShip3.toString();
         StringBuilder result = new StringBuilder();
@@ -275,10 +311,26 @@ public class AzurLaneService extends BaseService {
     private String parsePlace(Document d) {
         String template = templateOfPlace.toString();
         Element t = d.select(".wikitable").get(0);
-        template = template.replace("{立绘}", CQUtils.image(d.select(".wikitable").get(1).select("img").get(0).attr("src")));
-        template = template.replace("{名称}", clean2(t.select("tr:eq(0) th").text()));
-        template = template.replace("{地图掉落}", clean(t.select("tr:eq(12) td").text()));
-        template = template.replace("{掉落信息}", parsePlace1(d));
+        try {
+            template = template.replace("{立绘}", CQUtils.image(d.select(".wikitable").get(1).select("img").get(0).attr("src")));
+        } catch (Exception e) {
+            e.getMessage();
+        }
+        try {
+            template = template.replace("{名称}", clean2(t.select("tr:eq(0) th").text()));
+        } catch (Exception e) {
+            e.getMessage();
+        }
+        try {
+            template = template.replace("{地图掉落}", clean(t.select("tr:eq(12) td").text()));
+        } catch (Exception e) {
+            e.getMessage();
+        }
+        try {
+            template = template.replace("{掉落信息}", parsePlace1(d));
+        } catch (Exception e) {
+            e.getMessage();
+        }
         template = template.replace("{copyright}", copyright());
         return template;
     }
