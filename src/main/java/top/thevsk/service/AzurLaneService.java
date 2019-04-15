@@ -25,7 +25,7 @@ public class AzurLaneService extends BaseService {
     private StringBuilder templateOfPlace1;
 
     private String copyright() {
-        return "内容来源：碧蓝海事局(碧蓝航线WIKI) *注:仅转载，不作为商业用途";
+        return "内容来源：碧蓝海事局(碧蓝航线WIKI)";
     }
 
     @Override
@@ -127,11 +127,11 @@ public class AzurLaneService extends BaseService {
 
     public String search(String name) {
         if (StrKit.isBlank(name)) {
-            throw new VskException("未知查询条件");
+            return null;
         }
         Document document = connect(name.trim().replace(" ", ""));
         if (document == null) {
-            throw new VskException("404!!");
+            return null;
         }
         Type type = getType(document);
         switch (type) {
@@ -140,7 +140,7 @@ public class AzurLaneService extends BaseService {
             case PLACE:
                 return parsePlace(document);
             default:
-                throw new VskException("未知类型");
+                return null;
         }
     }
 
