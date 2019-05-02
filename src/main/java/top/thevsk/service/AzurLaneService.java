@@ -10,11 +10,19 @@ import top.thevsk.exception.VskException;
 import top.thevsk.utils.CQUtils;
 
 import java.io.IOException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * 碧蓝航线wiki查询
  */
 public class AzurLaneService extends BaseService {
+
+    public static void main(String[] args) {
+        AzurLaneService azurLaneService = new AzurLaneService();
+        azurLaneService.init();
+        System.out.println(azurLaneService.search("新月"));
+    }
 
     private static final String wikiUrl = "http://wiki.joyme.com/blhx/";
     private StringBuilder templateOfShip;
@@ -47,7 +55,8 @@ public class AzurLaneService extends BaseService {
         templateOfShip.append(Constants.newLine);
         templateOfShip.append("{名称}");
         templateOfShip.append(Constants.newLine);
-        templateOfShip.append("编号:{编号}");
+        templateOfShip.append("{信息}");
+        /*templateOfShip.append("编号:{编号}");
         templateOfShip.append(Constants.newLine);
         templateOfShip.append("初始星级:{初始星级}");
         templateOfShip.append(Constants.newLine);
@@ -65,7 +74,7 @@ public class AzurLaneService extends BaseService {
         templateOfShip.append(Constants.nextMsg);
         templateOfShip.append("普通掉落点:{普通掉落点}");
         templateOfShip.append(Constants.newLine);
-        templateOfShip.append("活动掉落点:{活动掉落点}");
+        templateOfShip.append("活动掉落点:{活动掉落点}");*/
         templateOfShip.append(Constants.nextMsg);
         templateOfShip.append("性能:");
         templateOfShip.append(Constants.newLine);
@@ -74,6 +83,8 @@ public class AzurLaneService extends BaseService {
         templateOfShip.append("技能:");
         templateOfShip.append(Constants.newLine);
         templateOfShip.append("{技能}");
+        templateOfShip.append(Constants.nextMsg);
+        templateOfShip.append("{改造}");
         templateOfShip.append(Constants.newLine);
         templateOfShip.append("{copyright}");
         templateOfShip1.append("耐久:{耐久eng}({耐久content})");
@@ -112,12 +123,14 @@ public class AzurLaneService extends BaseService {
         templateOfPlace.append(Constants.newLine);
         templateOfPlace.append("{名称}");
         templateOfPlace.append(Constants.newLine);
-        templateOfPlace.append("地图掉落:{地图掉落}");
+        templateOfPlace.append("{信息}");
+        //templateOfPlace.append("地图掉落:{地图掉落}");
         templateOfPlace.append(Constants.nextMsg);
         templateOfPlace.append("{掉落信息}");
         templateOfPlace.append(Constants.newLine);
         templateOfPlace.append("{copyright}");
         templateOfPlace1.append("{标题}:{内容}");
+        templateOfPlace1.append(Constants.newLine);
         templateOfPlace1.append(Constants.newLine);
     }
 
@@ -186,7 +199,43 @@ public class AzurLaneService extends BaseService {
         } catch (Exception e) {
             e.getMessage();
         }
-        try {
+        StringBuilder stringBuilder = new StringBuilder();
+        Elements msg = t.select("tr");
+        for (int i = 0; i < msg.size(); i++) {
+            try {
+                if (i == 0) continue;
+                if (i == 1) {
+                    stringBuilder.append(clean(msg.get(i).select("td:eq(1)").text()));
+                    stringBuilder.append(":");
+                    stringBuilder.append(clean(msg.get(i).select("td:eq(2)").text()));
+                    stringBuilder.append(Constants.newLine);
+                    stringBuilder.append(clean(msg.get(i).select("td:eq(3)").text()));
+                    stringBuilder.append(":");
+                    stringBuilder.append(clean(msg.get(i).select("td:eq(4)").text()));
+                    stringBuilder.append(Constants.newLine);
+                    continue;
+                }
+                if (i == 2) {
+                    stringBuilder.append(clean(msg.get(i).select("td:eq(0)").text()));
+                    stringBuilder.append(":");
+                    stringBuilder.append(clean(msg.get(i).select("td:eq(1)").text()));
+                    stringBuilder.append(Constants.newLine);
+                    stringBuilder.append(clean(msg.get(i).select("td:eq(2)").text()));
+                    stringBuilder.append(":");
+                    stringBuilder.append(clean(msg.get(i).select("td:eq(3)").text()));
+                    stringBuilder.append(Constants.newLine);
+                }
+                if (clean(msg.get(i).select("td:eq(0)").text()).contains("强化所需经验")) break;
+                stringBuilder.append(clean(msg.get(i).select("td:eq(0)").text()));
+                stringBuilder.append(":");
+                stringBuilder.append(clean(msg.get(i).select("td:eq(1)").text()));
+                stringBuilder.append(Constants.newLine);
+            } catch (Exception e) {
+                e.getMessage();
+            }
+        }
+        template = template.replace("{信息}", stringBuilder.toString());
+        /*try {
             template = template.replace("{编号}", clean(t.select("tr:eq(1) td:eq(2)").text()));
         } catch (Exception e) {
             e.getMessage();
@@ -235,7 +284,7 @@ public class AzurLaneService extends BaseService {
             template = template.replace("{活动掉落点}", clean(t.select("tr:eq(5) td:eq(1)").text()));
         } catch (Exception e) {
             e.getMessage();
-        }
+        }*/
         try {
             template = template.replace("{性能}", parseShip1(d));
         } catch (Exception e) {
@@ -243,6 +292,35 @@ public class AzurLaneService extends BaseService {
         }
         try {
             template = template.replace("{技能}", parseShip3(d));
+        } catch (Exception e) {
+            e.getMessage();
+        }
+        try {
+            boolean gzFlag = false;
+            StringBuilder gzStr = new StringBuilder();
+            Elements gzSearcher = d.select(".mw-headline");
+            for (Element element : gzSearcher) {
+                if (element.text().contains("改造详情")) {
+                    if (d.select(".wikibox-biginside").size() > 1) {
+                        gzFlag = true;
+                    }
+                    break;
+                }
+            }
+            if (gzFlag) {
+                gzStr.append("改造：");
+                gzStr.append(Constants.newLine);
+                Element gzEle = d.select(".wikibox-biginside").get(1);
+                try {
+                    gzStr.append(CQUtils.image(gzEle.select(".wikitable").get(0).select("img").attr("src")));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                gzStr.append(Constants.newLine);
+                gzStr.append("需求合计：");
+                gzStr.append(clean(gzEle.select(".wikitable").get(1).select("tr").last().select("td").text()));
+            }
+            template = template.replace("{改造}", gzStr.toString());
         } catch (Exception e) {
             e.getMessage();
         }
@@ -260,6 +338,7 @@ public class AzurLaneService extends BaseService {
         template = template.replace("{航空eng}", clean(t1.select("tr:eq(3) td:eq(1)").text()));
         template = template.replace("{雷击eng}", clean(t1.select("tr:eq(4) td:eq(1)").text()));
         template = template.replace("{炮击eng}", clean(t1.select("tr:eq(5) td:eq(1)").text()));
+        System.out.println(t2.select("tr:eq(3) td:eq(1)").text());
         template = template.replace("{耐久content}", clean1(t2.select("tr:eq(3) td:eq(1)").text()));
         template = template.replace("{防空content}", clean1(t2.select("tr:eq(5) td:eq(1)").text()));
         template = template.replace("{机动content}", clean1(t2.select("tr:eq(4) td:eq(5)").text()));
@@ -276,19 +355,16 @@ public class AzurLaneService extends BaseService {
 
     private String clean1(String s) {
         return clean(s
+                .replace("A→A", "")
                 .replace("A ", "")
+                .replace("B→B", "")
                 .replace("B ", "")
+                .replace("C→C", "")
                 .replace("C ", "")
+                .replace("D→D", "")
                 .replace("D ", "")
+                .replace("E→E", "")
                 .replace("E ", ""));
-    }
-
-    private String clean(String s) {
-        s = s.replace("\r", "");
-        s = s.replace("\n", "");
-        s = s.replace("\t", "");
-        s = s.replace("→", " >> ");
-        return s.trim();
     }
 
     private String parseShip3(Document d) {
@@ -321,11 +397,67 @@ public class AzurLaneService extends BaseService {
         } catch (Exception e) {
             e.getMessage();
         }
-        try {
+        Elements msg = t.select("tr");
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int i = 0; i < msg.size(); i++) {
+            try {
+                if (i == 0) continue;
+                String value  = clean(msg.get(i).select("td").text());
+                if (value.contains("{{{")) continue;
+                String title = clean(msg.get(i).select("th").text());
+                if (title.contains("介绍")) continue;
+                if (title.contains("推图视频")) continue;
+                if (title.contains("三星条件")) continue;
+                if (title.contains("三星奖励")) continue;
+                if (title.contains("信号强度")) continue;
+                if (title.contains("通关奖励")) continue;
+                if (title.contains("危险等级")) continue;
+                if (title.contains("敌舰等级")) {
+                    stringBuilder.append("敌舰等级");
+                    stringBuilder.append(":");
+                    stringBuilder.append(clean(msg.get(i).select("td").html().split("<br>")[0]));
+                    stringBuilder.append(Constants.newLine);
+                    continue;
+                }
+                if (title.contains("BOSS位置")) {
+                    stringBuilder.append("BOSS信息");
+                    stringBuilder.append(":");
+                    stringBuilder.append(clean(msg.get(i).select("td").html().split("<br>")[1]));
+                    stringBuilder.append(Constants.blank);
+                    stringBuilder.append("等级");
+                    stringBuilder.append(clean(msg.get(i).select("td").html().split("<br>")[2]));
+                    stringBuilder.append(Constants.newLine);
+                    continue;
+                }
+                if (title.contains("备注")) {
+                    if (msg.get(i).select("td").html().contains("<br>")) {
+                        stringBuilder.append("备注");
+                        stringBuilder.append(":");
+                        stringBuilder.append(Constants.newLine);
+                        String[] back = msg.get(i).select("td").html().split("<br>");
+                        for (String bak : back) {
+                            if (StrKit.isBlank(bak)) continue;
+                            if (bak.contains("<") || bak.contains(">")) continue;
+                            stringBuilder.append(bak);
+                            stringBuilder.append(Constants.newLine);
+                        }
+                        continue;
+                    }
+                }
+                stringBuilder.append(title);
+                stringBuilder.append(":");
+                stringBuilder.append(value);
+                stringBuilder.append(Constants.newLine);
+            } catch (Exception e) {
+                e.getMessage();
+            }
+        }
+        template = template.replace("{信息}", stringBuilder.toString());
+        /*try {
             template = template.replace("{地图掉落}", clean(t.select("tr:eq(12) td").text()));
         } catch (Exception e) {
             e.getMessage();
-        }
+        }*/
         try {
             template = template.replace("{掉落信息}", parsePlace1(d));
         } catch (Exception e) {
@@ -333,6 +465,14 @@ public class AzurLaneService extends BaseService {
         }
         template = template.replace("{copyright}", copyright());
         return template;
+    }
+
+    private String clean(String s) {
+        s = s.replace("\r", "");
+        s = s.replace("\n", "");
+        s = s.replace("\t", "");
+        s = s.replace("→", " → ");
+        return delHTMLTag(s.trim());
     }
 
     private String parsePlace1(Document d) {
@@ -351,5 +491,25 @@ public class AzurLaneService extends BaseService {
     private String clean2(String s) {
         return clean(s
                 .replace("▶", ""));
+    }
+
+    private String delHTMLTag(String htmlStr) {
+        String regEx_script = "<script[^>]*?>[\\s\\S]*?<\\/script>";
+        String regEx_style = "<style[^>]*?>[\\s\\S]*?<\\/style>";
+        String regEx_html = "<[^>]+>";
+
+        Pattern p_script = Pattern.compile(regEx_script, Pattern.CASE_INSENSITIVE);
+        Matcher m_script = p_script.matcher(htmlStr);
+        htmlStr = m_script.replaceAll("");
+
+        Pattern p_style = Pattern.compile(regEx_style, Pattern.CASE_INSENSITIVE);
+        Matcher m_style = p_style.matcher(htmlStr);
+        htmlStr = m_style.replaceAll("");
+
+        Pattern p_html = Pattern.compile(regEx_html, Pattern.CASE_INSENSITIVE);
+        Matcher m_html = p_html.matcher(htmlStr);
+        htmlStr = m_html.replaceAll("");
+
+        return htmlStr.trim();
     }
 }
