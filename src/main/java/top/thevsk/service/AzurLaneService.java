@@ -6,7 +6,6 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import top.thevsk.entity.Constants;
-import top.thevsk.exception.VskException;
 import top.thevsk.utils.CQUtils;
 
 import java.io.IOException;
@@ -21,7 +20,7 @@ public class AzurLaneService extends BaseService {
     public static void main(String[] args) {
         AzurLaneService azurLaneService = new AzurLaneService();
         azurLaneService.init();
-        System.out.println(azurLaneService.search("新月"));
+        System.out.println(azurLaneService.search("高雄"));
     }
 
     private static final String wikiUrl = "http://wiki.joyme.com/blhx/";
@@ -56,26 +55,7 @@ public class AzurLaneService extends BaseService {
         templateOfShip.append("{名称}");
         templateOfShip.append(Constants.newLine);
         templateOfShip.append("{信息}");
-        /*templateOfShip.append("编号:{编号}");
         templateOfShip.append(Constants.newLine);
-        templateOfShip.append("初始星级:{初始星级}");
-        templateOfShip.append(Constants.newLine);
-        templateOfShip.append("类型:{类型}");
-        templateOfShip.append(Constants.newLine);
-        templateOfShip.append("稀有度:{稀有度}");
-        templateOfShip.append(Constants.newLine);
-        templateOfShip.append("阵营:{阵营}");
-        templateOfShip.append(Constants.newLine);
-        templateOfShip.append("耗时:{耗时}");
-        templateOfShip.append(Constants.newLine);
-        templateOfShip.append("营养价值:{营养价值}");
-        templateOfShip.append(Constants.newLine);
-        templateOfShip.append("退役收益:{退役收益}");
-        templateOfShip.append(Constants.nextMsg);
-        templateOfShip.append("普通掉落点:{普通掉落点}");
-        templateOfShip.append(Constants.newLine);
-        templateOfShip.append("活动掉落点:{活动掉落点}");*/
-        templateOfShip.append(Constants.nextMsg);
         templateOfShip.append("性能:");
         templateOfShip.append(Constants.newLine);
         templateOfShip.append("{性能}");
@@ -83,10 +63,16 @@ public class AzurLaneService extends BaseService {
         templateOfShip.append("技能:");
         templateOfShip.append(Constants.newLine);
         templateOfShip.append("{技能}");
-        templateOfShip.append(Constants.nextMsg);
+        templateOfShip.append(Constants.newLine);
+        templateOfShip.append("装备推荐:");
+        templateOfShip.append(Constants.newLine);
+        templateOfShip.append("{装备推荐}");
+        templateOfShip.append(Constants.newLine);
         templateOfShip.append("{改造}");
         templateOfShip.append(Constants.newLine);
         templateOfShip.append("{copyright}");
+        templateOfShip.append(Constants.newLine);
+        templateOfShip.append("{sourceLink}");
         templateOfShip1.append("耐久:{耐久eng}({耐久content})");
         templateOfShip1.append(Constants.newLine);
         templateOfShip1.append("防空:{防空eng}({防空content})");
@@ -108,7 +94,11 @@ public class AzurLaneService extends BaseService {
         templateOfShip1.append("航速:({航速content})");
         templateOfShip1.append(Constants.newLine);
         templateOfShip1.append("装甲:{装甲content}");
-        templateOfShip2.append("{阶段}:{阶段内容}");
+        templateOfShip2.append("{名称}:{内容}");
+        templateOfShip2.append(Constants.newLine);
+        templateOfShip2.append("推荐理由:{推荐理由}");
+        templateOfShip2.append(Constants.newLine);
+        templateOfShip2.append("推荐人:{推荐人}");
         templateOfShip2.append(Constants.newLine);
         templateOfShip3.append("{技能ico}");
         templateOfShip3.append(Constants.newLine);
@@ -124,11 +114,11 @@ public class AzurLaneService extends BaseService {
         templateOfPlace.append("{名称}");
         templateOfPlace.append(Constants.newLine);
         templateOfPlace.append("{信息}");
-        //templateOfPlace.append("地图掉落:{地图掉落}");
         templateOfPlace.append(Constants.nextMsg);
         templateOfPlace.append("{掉落信息}");
-        templateOfPlace.append(Constants.newLine);
         templateOfPlace.append("{copyright}");
+        templateOfPlace.append(Constants.newLine);
+        templateOfPlace.append("{sourceLink}");
         templateOfPlace1.append("{标题}:{内容}");
         templateOfPlace1.append(Constants.newLine);
         templateOfPlace1.append(Constants.newLine);
@@ -224,6 +214,7 @@ public class AzurLaneService extends BaseService {
                     stringBuilder.append(":");
                     stringBuilder.append(clean(msg.get(i).select("td:eq(3)").text()));
                     stringBuilder.append(Constants.newLine);
+                    continue;
                 }
                 if (clean(msg.get(i).select("td:eq(0)").text()).contains("强化所需经验")) break;
                 stringBuilder.append(clean(msg.get(i).select("td:eq(0)").text()));
@@ -235,56 +226,6 @@ public class AzurLaneService extends BaseService {
             }
         }
         template = template.replace("{信息}", stringBuilder.toString());
-        /*try {
-            template = template.replace("{编号}", clean(t.select("tr:eq(1) td:eq(2)").text()));
-        } catch (Exception e) {
-            e.getMessage();
-        }
-        try {
-            template = template.replace("{初始星级}", clean(t.select("tr:eq(1) td:eq(4)").text()));
-        } catch (Exception e) {
-            e.getMessage();
-        }
-        try {
-            template = template.replace("{类型}", clean(t.select("tr:eq(2) td:eq(1)").text()));
-        } catch (Exception e) {
-            e.getMessage();
-        }
-        try {
-            template = template.replace("{稀有度}", clean(t.select("tr:eq(2) td:eq(3)").text()));
-        } catch (Exception e) {
-            e.getMessage();
-        }
-        try {
-            template = template.replace("{阵营}", clean(t.select("tr:eq(3) td:eq(1)").text()));
-        } catch (Exception e) {
-            e.getMessage();
-        }
-        try {
-            template = template.replace("{耗时}", clean(t.select("tr:eq(3) td:eq(3)").text()));
-        } catch (Exception e) {
-            e.getMessage();
-        }
-        try {
-            template = template.replace("{营养价值}", clean(t.select("tr:eq(6) td:eq(1)").text()));
-        } catch (Exception e) {
-            e.getMessage();
-        }
-        try {
-            template = template.replace("{退役收益}", clean(t.select("tr:eq(7) td:eq(1)").text()));
-        } catch (Exception e) {
-            e.getMessage();
-        }
-        try {
-            template = template.replace("{普通掉落点}", clean(t.select("tr:eq(4) td:eq(1)").text()));
-        } catch (Exception e) {
-            e.getMessage();
-        }
-        try {
-            template = template.replace("{活动掉落点}", clean(t.select("tr:eq(5) td:eq(1)").text()));
-        } catch (Exception e) {
-            e.getMessage();
-        }*/
         try {
             template = template.replace("{性能}", parseShip1(d));
         } catch (Exception e) {
@@ -295,6 +236,7 @@ public class AzurLaneService extends BaseService {
         } catch (Exception e) {
             e.getMessage();
         }
+        template = template.replace("{装备推荐}", parseShip2(d));
         try {
             boolean gzFlag = false;
             StringBuilder gzStr = new StringBuilder();
@@ -325,6 +267,7 @@ public class AzurLaneService extends BaseService {
             e.getMessage();
         }
         template = template.replace("{copyright}", copyright());
+        template = template.replace("{sourceLink}", d.baseUri());
         return template;
     }
 
@@ -338,7 +281,6 @@ public class AzurLaneService extends BaseService {
         template = template.replace("{航空eng}", clean(t1.select("tr:eq(3) td:eq(1)").text()));
         template = template.replace("{雷击eng}", clean(t1.select("tr:eq(4) td:eq(1)").text()));
         template = template.replace("{炮击eng}", clean(t1.select("tr:eq(5) td:eq(1)").text()));
-        System.out.println(t2.select("tr:eq(3) td:eq(1)").text());
         template = template.replace("{耐久content}", clean1(t2.select("tr:eq(3) td:eq(1)").text()));
         template = template.replace("{防空content}", clean1(t2.select("tr:eq(5) td:eq(1)").text()));
         template = template.replace("{机动content}", clean1(t2.select("tr:eq(4) td:eq(5)").text()));
@@ -353,18 +295,37 @@ public class AzurLaneService extends BaseService {
         return template;
     }
 
-    private String clean1(String s) {
-        return clean(s
-                .replace("A→A", "")
-                .replace("A ", "")
-                .replace("B→B", "")
-                .replace("B ", "")
-                .replace("C→C", "")
-                .replace("C ", "")
-                .replace("D→D", "")
-                .replace("D ", "")
-                .replace("E→E", "")
-                .replace("E ", ""));
+    private String parseShip2(Document d) {
+        try {
+            String template = templateOfShip2.toString();
+            StringBuilder result = new StringBuilder();
+            Element t = d.select(".panel-primary").get(0);
+            if (clean(t.select("a.panel-title").get(0).text()).equals("PVE配装")) {
+                Elements contents = t.select(".tab-content").get(0).select(".tab-pane").get(0).children();
+                for (Element content :contents) {
+                    try {
+                        String res = template;
+                        res = res.replace("{名称}", clean(content.select("table tbody tr:eq(0) th:eq(0)").text()));
+                        Elements equipments = content.select(".REt");
+                        StringBuilder equipmentStr = new StringBuilder();
+                        for (Element equipment : equipments) {
+                            equipmentStr.append(Constants.blank);
+                            equipmentStr.append(CQUtils.image(equipment.select("img").attr("src")));
+                            equipmentStr.append(clean(equipment.text()));
+                        }
+                        res = res.replace("{内容}", equipmentStr.toString());
+                        res = res.replace("{推荐理由}", clean(content.select("table tbody tr").get(1).select("td").text()));
+                        res = res.replace("{推荐人}", clean(content.select("table tbody tr").get(0).select("td").get(1).text()));
+                        result.append(res);
+                    } catch (Exception e) {
+                        e.getMessage();
+                    }
+                }
+            }
+            return result.toString();
+        } catch (Exception e) {
+            return "";
+        }
     }
 
     private String parseShip3(Document d) {
@@ -453,26 +414,14 @@ public class AzurLaneService extends BaseService {
             }
         }
         template = template.replace("{信息}", stringBuilder.toString());
-        /*try {
-            template = template.replace("{地图掉落}", clean(t.select("tr:eq(12) td").text()));
-        } catch (Exception e) {
-            e.getMessage();
-        }*/
         try {
             template = template.replace("{掉落信息}", parsePlace1(d));
         } catch (Exception e) {
             e.getMessage();
         }
         template = template.replace("{copyright}", copyright());
+        template = template.replace("{sourceLink}", d.baseUri());
         return template;
-    }
-
-    private String clean(String s) {
-        s = s.replace("\r", "");
-        s = s.replace("\n", "");
-        s = s.replace("\t", "");
-        s = s.replace("→", " → ");
-        return delHTMLTag(s.trim());
     }
 
     private String parsePlace1(Document d) {
@@ -486,6 +435,28 @@ public class AzurLaneService extends BaseService {
             result.append(res);
         }
         return result.toString();
+    }
+
+    private String clean(String s) {
+        s = s.replace("\r", "");
+        s = s.replace("\n", "");
+        s = s.replace("\t", "");
+        s = s.replace("→", " → ");
+        return delHTMLTag(s.trim());
+    }
+
+    private String clean1(String s) {
+        return clean(s
+                .replace("A→A", "")
+                .replace("A ", "")
+                .replace("B→B", "")
+                .replace("B ", "")
+                .replace("C→C", "")
+                .replace("C ", "")
+                .replace("D→D", "")
+                .replace("D ", "")
+                .replace("E→E", "")
+                .replace("E ", ""));
     }
 
     private String clean2(String s) {
