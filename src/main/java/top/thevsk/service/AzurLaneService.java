@@ -71,8 +71,8 @@ public class AzurLaneService extends BaseService {
         templateOfShip.append("{改造}");
         templateOfShip.append(Constants.newLine);
         templateOfShip.append("{copyright}");
-        templateOfShip.append(Constants.newLine);
-        templateOfShip.append("{sourceLink}");
+        /*templateOfShip.append(Constants.newLine);
+        templateOfShip.append("{sourceLink}");*/
         templateOfShip1.append("耐久:{耐久eng}({耐久content})");
         templateOfShip1.append(Constants.newLine);
         templateOfShip1.append("防空:{防空eng}({防空content})");
@@ -117,8 +117,8 @@ public class AzurLaneService extends BaseService {
         templateOfPlace.append(Constants.nextMsg);
         templateOfPlace.append("{掉落信息}");
         templateOfPlace.append("{copyright}");
-        templateOfPlace.append(Constants.newLine);
-        templateOfPlace.append("{sourceLink}");
+        /*templateOfPlace.append(Constants.newLine);
+        templateOfPlace.append("{sourceLink}");*/
         templateOfPlace1.append("{标题}:{内容}");
         templateOfPlace1.append(Constants.newLine);
         templateOfPlace1.append(Constants.newLine);
